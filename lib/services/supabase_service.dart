@@ -12,15 +12,15 @@ class SupabaseService {
 
   // ---------------- AUTH ----------------
 
-  Future<void> signInWithPhone(String phone) async {
-    await _client.auth.signInWithOtp(phone: phone);
+  Future<void> signInWithEmail(String email) async {
+  await _client.auth.signInWithOtp(email: email);
   }
 
-  Future<AuthResponse> verifyOtp(String phone, String token) {
+  Future<AuthResponse> verifyOtp(String email, String token) {
     return _client.auth.verifyOTP(
-      phone: phone,
+      email: email,
       token: token,
-      type: OtpType.sms,
+      type: OtpType.email,
     );
   }
 
