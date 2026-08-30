@@ -1,7 +1,5 @@
 name: Build Android APK
 
-# Runs automatically on every push to main, and can also be triggered
-# manually from the Actions tab in GitHub ("Run workflow" button).
 on:
   push:
     branches: [main]
@@ -32,11 +30,17 @@ jobs:
       - name: Generate Android platform files
         run: flutter create --platforms=android .
 
+      - name: Ensure INTERNET permission in release manifest
+        run: |
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          if ! grep -q "android.permission.INTERNET" "$MANIFEST"; then
+            sed -i '/<manifest[^>]*>/a \    <uses-permission android:name="android.permission.INTERNET"\/>' "$MANIFEST"
+          fi
+          cat "$MANIFEST"
+
       - name: Build release APK
         run: flutter build apk --release
 
-      # Uploads the APK as a downloadable build artifact — find it under
-      # the specific workflow run, in the "Artifacts" section at the bottom.
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
