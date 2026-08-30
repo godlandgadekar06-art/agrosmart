@@ -21,7 +21,7 @@ class AppStrings {
   static const Map<String, Map<String, String>> _strings = {
     'app_name': {'en': 'AgroSmart', 'mr': 'अ‍ॅग्रोस्मार्ट'},
     'login_title': {'en': 'Welcome to AgroSmart', 'mr': 'अ‍ॅग्रोस्मार्टमध्ये आपले स्वागत आहे'},
-    'phone_hint': {'en': 'Enter mobile number', 'mr': 'मोबाईल नंबर टाका'},
+    'email_hint': {'en': 'Enter email address', 'mr': 'ईमेल पत्ता टाका'},
     'send_otp': {'en': 'Send OTP', 'mr': 'ओटीपी पाठवा'},
     'enter_otp': {'en': 'Enter OTP', 'mr': 'ओटीपी टाका'},
     'verify': {'en': 'Verify', 'mr': 'पडताळणी करा'},
