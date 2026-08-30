@@ -11,16 +11,20 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
   final _otpController = TextEditingController();
   bool _otpSent = false;
   bool _loading = false;
   String? _error;
 
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
+  }
+
   Future<void> _sendOtp() async {
-    final phone = _phoneController.text.trim();
-    if (phone.length < 10) {
-      setState(() => _error = 'Enter a valid mobile number');
+    final email = _emailController.text.trim();
+    if (!_isValidEmail(email)) {
+      setState(() => _error = 'Enter a valid email address');
       return;
     }
     setState(() {
@@ -28,12 +32,10 @@ class _LoginScreenState extends State<LoginScreen> {
       _error = null;
     });
     try {
-      // Supabase expects E.164 format; assume India (+91) if not provided.
-      final formatted = phone.startsWith('+') ? phone : '+91$phone';
-      await SupabaseService.instance.signInWithPhone(formatted);
+      await SupabaseService.instance.signInWithEmail(email);
       setState(() => _otpSent = true);
     } catch (e) {
-      setState(() => _error = 'Could not send OTP. Check connection.');
+      setState(() => _error = 'Could not send code. Check connection.');
     } finally {
       setState(() => _loading = false);
     }
@@ -45,16 +47,15 @@ class _LoginScreenState extends State<LoginScreen> {
       _error = null;
     });
     try {
-      final phone = _phoneController.text.trim();
-      final formatted = phone.startsWith('+') ? phone : '+91$phone';
+      final email = _emailController.text.trim();
       await SupabaseService.instance.verifyOtp(
-        formatted,
+        email,
         _otpController.text.trim(),
       );
       // AuthGate (in main.dart) listens for auth state changes and will
       // automatically navigate on success — nothing else to do here.
     } catch (e) {
-      setState(() => _error = 'Invalid OTP. Try again.');
+      setState(() => _error = 'Invalid code. Try again.');
     } finally {
       setState(() => _loading = false);
     }
@@ -87,12 +88,12 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 32),
               if (!_otpSent) ...[
                 TextField(
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
                   style: const TextStyle(fontSize: 18),
                   decoration: InputDecoration(
-                    hintText: s.t('phone_hint'),
-                    prefixIcon: const Icon(Icons.phone_android),
+                    hintText: s.t('email_hint'),
+                    prefixIcon: const Icon(Icons.email_outlined),
                   ),
                 ),
                 const SizedBox(height: 20),
