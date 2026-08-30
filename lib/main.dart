@@ -9,8 +9,8 @@ import 'screens/profile_setup_screen.dart';
 import 'screens/dashboard_screen.dart';
 
 // Fill these in from Supabase Project Settings > API
-const supabaseUrl = 'https://YOUR_PROJECT_REF.supabase.co';
-const supabaseAnonKey = 'YOUR_ANON_PUBLIC_KEY';
+const supabaseUrl = 'https://vnjqieavpgfpnyknokqh.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZuanFpZWF2cGdmcG55a25va3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwOTI0MzksImV4cCI6MjEwMzY2ODQzOX0.ncgWr94O_FWH-3aqYxBQ_OHzG_Y3svvE0gSxuZNug_A';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
