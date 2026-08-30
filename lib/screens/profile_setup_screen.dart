@@ -11,6 +11,7 @@ class ProfileSetupScreen extends StatefulWidget {
 
 class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final _nameCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
   final _villageCtrl = TextEditingController();
   final _talukaCtrl = TextEditingController();
   final _farmSizeCtrl = TextEditingController();
@@ -20,10 +21,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   Future<void> _save() async {
     if (_nameCtrl.text.trim().isEmpty) return;
     setState(() => _saving = true);
-    final phone = SupabaseService.instance.currentUser?.phone ?? '';
     await SupabaseService.instance.upsertFarmerProfile(
       name: _nameCtrl.text.trim(),
-      phone: phone,
+      phone: _phoneCtrl.text.trim(),
       village: _villageCtrl.text.trim(),
       taluka: _talukaCtrl.text.trim(),
       preferredLanguage: _language,
@@ -60,6 +60,12 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
             TextField(
               controller: _nameCtrl,
               decoration: InputDecoration(hintText: s.t('name_hint')),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: _phoneCtrl,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(hintText: s.t('phone_hint')),
             ),
             const SizedBox(height: 14),
             TextField(
