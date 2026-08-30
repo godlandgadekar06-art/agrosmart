@@ -1,0 +1,41 @@
+name: Build Android APK
+
+# Runs automatically on every push to main, and can also be triggered
+# manually from the Actions tab in GitHub ("Run workflow" button).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      # Uploads the APK as a downloadable build artifact — find it under
+      # the specific workflow run, in the "Artifacts" section at the bottom.
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: agrosmart-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
