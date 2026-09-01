@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await SupabaseService.instance.signInWithEmail(email);
       setState(() => _otpSent = true);
     } catch (e) {
-      setState(() => _error = 'Could not send code. Check connection.');
+      setState(() => _error = 'Error: $e');
     } finally {
       setState(() => _loading = false);
     }
