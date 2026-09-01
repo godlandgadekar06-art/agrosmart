@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_strings.dart';
 import '../services/supabase_service.dart';
+import '../theme.dart';
+import 'dashboard_screen.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key});
@@ -17,23 +19,40 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final _farmSizeCtrl = TextEditingController();
   String _language = 'mr';
   bool _saving = false;
+  String? _error;
 
   Future<void> _save() async {
     if (_nameCtrl.text.trim().isEmpty) return;
-    setState(() => _saving = true);
-    await SupabaseService.instance.upsertFarmerProfile(
-      name: _nameCtrl.text.trim(),
-      phone: _phoneCtrl.text.trim(),
-      village: _villageCtrl.text.trim(),
-      taluka: _talukaCtrl.text.trim(),
-      preferredLanguage: _language,
-      farmSizeAcres: double.tryParse(_farmSizeCtrl.text.trim()),
-    );
-    // AuthGate rebuilds automatically once the profile exists — Supabase's
-    // realtime-aware FutureBuilder in main.dart will pick it up on the
-    // next auth-state tick. A manual setState/pop isn't needed here since
-    // this screen is only ever shown from AuthGate.
-    setState(() => _saving = false);
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await SupabaseService.instance.upsertFarmerProfile(
+        name: _nameCtrl.text.trim(),
+        phone: _phoneCtrl.text.trim(),
+        village: _villageCtrl.text.trim(),
+        taluka: _talukaCtrl.text.trim(),
+        preferredLanguage: _language,
+        farmSizeAcres: double.tryParse(_farmSizeCtrl.text.trim()),
+      );
+
+      final profile = await SupabaseService.instance.getFarmerProfile();
+      if (!mounted) return;
+      if (profile != null) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => DashboardScreen(farmerProfile: profile),
+          ),
+        );
+      } else {
+        setState(() => _error = 'Profile saved but could not be loaded. Try again.');
+      }
+    } catch (e) {
+      setState(() => _error = 'Could not save: $e');
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   @override
@@ -45,9 +64,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            // Language picker first — everything below should render in
-            // the chosen language once picked, keeping first impressions
-            // in the farmer's own language from the very first field.
             SegmentedButton<String>(
               segments: const [
                 ButtonSegment(value: 'mr', label: Text('मराठी')),
@@ -90,6 +106,14 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ? const CircularProgressIndicator(color: Colors.white)
                   : Text(s.t('save_continue')),
             ),
+            if (_error != null) ...[
+              const SizedBox(height: 16),
+              Text(
+                _error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: AppColors.alertRed),
+              ),
+            ],
           ],
         ),
       ),
